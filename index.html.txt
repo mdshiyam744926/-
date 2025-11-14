@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Monetag SDK Script is removed here as we will use a direct link -->
+    <!-- <script src='//libtl.com/sdk.js' data-zone='10138839' data-sdk='show_10138839'></script> -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Supporter App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --tiktok-red: #FE2C55;
+            --tiktok-dark: #121212;
+            --tiktok-light-dark: #222222;
+            --tiktok-text-color: #E6E6E6;
+            --tiktok-gray: #808080;
+            --tiktok-blue: #25F4EE; /* For accents */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--tiktok-dark);
+            color: var(--tiktok-text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--tiktok-light-dark);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .header-stats {
+            display: flex;
+            gap: 15px; /* Reduced gap for more space */
+        }
+        .header-stats span {
+            font-size: 1.0em; /* Slightly smaller font */
+            font-weight: 600;
+            color: var(--tiktok-text-color);
+            display: flex;
+            align-items: center;
+        }
+        .header-stats i {
+            color: var(--tiktok-red);
+            margin-right: 5px;
+        }
+        #break-timer {
+            background-color: var(--tiktok-blue);
+            color: var(--tiktok-dark);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: 700;
+            display: none; /* Initially hidden */
+            margin-left: 10px;
+        }
+        .app-title {
+            font-size: 1.2em; /* Slightly smaller */
+            font-weight: 700;
+            color: var(--tiktok-text-color);
+            letter-spacing: 0.5px;
+        }
+        .tiktok-icon {
+            font-size: 1.6em; /* Slightly smaller */
+            color: var(--tiktok-red);
+        }
+
+        .container {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 80px; /* Space for fixed nav-bar */
+        }
+
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            background-color: var(--tiktok-light-dark);
+            padding: 8px 0;
+            border-top: 1px solid #333;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--tiktok-gray);
+            text-decoration: none;
+            font-size: 0.75em;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+            flex: 1;
+        }
+        .nav-item.active, .nav-item:hover {
+            color: var(--tiktok-red);
+        }
+        .nav-item i {
+            font-size: 1.6em;
+            margin-bottom: 4px;
+        }
+        .nav-item span {
+            font-weight: 600;
+        }
+
+        /* Section Specific Styles */
+        .section {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--tiktok-light-dark);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            color: var(--tiktok-red);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        h3 {
+            color: var(--tiktok-text-color);
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Home Section */
+        .home-content {
+            text-align: center;
+        }
+        .home-content img {
+            width: 100%;
+            max-width: 380px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px solid var(--tiktok-red);
+            box-shadow: 0 0 15px rgba(254, 44, 85, 0.5);
+        }
+        .home-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-top: 20px;
+            color: var(--tiktok-text-color);
+        }
+        .home-stats i {
+            color: var(--tiktok-red);
+            margin-right: 8px;
+        }
+
+        /* Task Section */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .task-item {
+            background-color: var(--tiktok-dark);
+            padding: 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        .task-item:hover {
+            background-color: #2a2a2a;
+            transform: translateY(-3px);
+        }
+        .task-item img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--tiktok-blue);
+        }
+        .task-item span {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: var(--tiktok-text-color);
+        }
+        .task-item .task-link-icon {
+            margin-left: auto;
+            font-size: 1.2em;
+            color: var(--tiktok-gray);
+        }
+
+        /* Generic Button Style */
+        .app-btn {
+            background-color: var(--tiktok-red);
+            color: #fff;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        .app-btn:hover {
+            background-color: #c2185b;
+            transform: translateY(-2px);
+        }
+        .app-btn:disabled {
+            background-color: var(--tiktok-gray);
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+
+        /* Collect User Section */
+        .collect-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        .ads-counter {
+            font-size: 0.9em;
+            color: var(--tiktok-gray);
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+
+        /* Add User Section */
+        .add-user-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        .add-user-options .app-btn {
+            background-color: var(--tiktok-blue);
+        }
+        .add-user-options .app-btn:hover {
+            background-color: #1aa8a5;
+        }
+
+
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+        .popup-content {
+            background-color: var(--tiktok-light-dark);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+            position: relative;
+            border: 2px solid var(--tiktok-red);
+        }
+        .popup-content h3 {
+            margin-top: 0;
+            color: var(--tiktok-red);
+            font-size: 1.6em;
+        }
+        .popup-content p {
+            color: var(--tiktok-gray);
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        .popup-content input[type="text"],
+        .popup-content input[type="number"],
+        .popup-content input[type="file"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #555;
+            background-color: var(--tiktok-dark);
+            color: var(--tiktok-text-color);
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .popup-content input[type="file"] {
+            border: none;
+            padding: 0;
+        }
+        .popup-action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .popup-action-buttons .app-btn {
+            width: auto;
+            max-width: 150px;
+            margin: 0;
+            padding: 10px 20px;
+            font-size: 1em;
+        }
+        .popup-action-buttons .cancel-btn {
+            background-color: var(--tiktok-gray);
+        }
+        .popup-action-buttons .cancel-btn:hover {
+            background-color: #606060;
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            font-size: 1.8em;
+            cursor: pointer;
+            color: var(--tiktok-gray);
+            transition: color 0.3s ease;
+        }
+        .close-btn:hover {
+            color: var(--tiktok-red);
+        }
+
+        /* Live Chat Section */
+        .chat-window {
+            background-color: var(--tiktok-dark);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: 450px; /* Adjusted height for better viewing */
+            overflow: hidden; /* Use flex for inner scrolling */
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px; /* For scrollbar */
+        }
+        .chat-message-wrapper {
+            display: flex;
+            align-items: flex-start; /* Align avatar and message */
+            margin-bottom: 12px;
+            max-width: 85%;
+        }
+        .chat-message-wrapper.own {
+            margin-left: auto; /* Align own messages to the right */
+            flex-direction: row-reverse; /* Reverse order for own messages (message then avatar) */
+        }
+        .chat-message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--tiktok-blue);
+            margin-right: 10px;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        .chat-message-wrapper.own .chat-message-avatar {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+        .chat-message {
+            background-color: #333;
+            padding: 10px 15px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+            position: relative;
+            flex-grow: 1; /* Allow message to take available space */
+        }
+        .chat-message-wrapper.own .chat-message {
+            background-color: var(--tiktok-red);
+        }
+        .chat-message .sender-name {
+            font-size: 0.8em;
+            color: var(--tiktok-gray);
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+        .chat-message-wrapper.own .sender-name {
+             color: #ffcccc; /* Lighter color for own messages */
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #555;
+            background-color: var(--tiktok-dark);
+            color: var(--tiktok-text-color);
+            border-radius: 25px;
+            font-size: 1em;
+        }
+        .chat-input button {
+            background-color: var(--tiktok-red);
+            color: #fff;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .chat-input button:hover {
+            background-color: #c2185b;
+            transform: translateY(-2px);
+        }
+
+        /* Name & Photo Entry Popup for Chat */
+        .name-photo-entry-popup {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background-color: var(--tiktok-light-dark);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            margin-top: 20px;
+        }
+        .name-photo-entry-popup h3 {
+            margin-top: 0;
+            color: var(--tiktok-red);
+            font-size: 1.6em;
+        }
+        .name-photo-entry-popup input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: 1px solid #555;
+            background-color: var(--tiktok-dark);
+            color: var(--tiktok-text-color);
+            border-radius: 8px;
+            font-size: 1em;
+            max-width: 300px;
+        }
+        .profile-picture-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            border: 2px dashed var(--tiktok-gray);
+            border-radius: 10px;
+            padding: 15px;
+            width: 90%;
+            max-width: 300px;
+        }
+        .profile-picture-upload label {
+            cursor: pointer;
+            color: var(--tiktok-blue);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .profile-picture-upload input[type="file"] {
+            display: none; /* Hide default file input */
+        }
+        #profile-picture-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--tiktok-red);
+            margin-bottom: 10px;
+            display: none; /* Initially hidden */
+        }
+        #profile-picture-preview.active {
+            display: block;
+        }
+        .name-photo-entry-popup .app-btn {
+            max-width: 200px;
+        }
+
+        /* Scrollbar styles for webkit browsers */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: #222;
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--tiktok-gray);
+            border-radius: 10px;
+            border: 2px solid #222;
+        }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background-color: var(--tiktok-red);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-stats">
+            <span><i class="fas fa-heart"></i> <span id="total-likes">0</span></span>
+            <span><i class="fas fa-eye"></i> <span id="total-views">0</span></span>
+            <span id="break-timer" style="display: none;">ব্রেক: 00:00:00</span>
+        </div>
+        <div class="app-title">TikTok Supporter</div>
+        <i class="fab fa-tiktok tiktok-icon"></i>
+    </div>
+
+    <div class="container">
+        <!-- Home Section -->
+        <div id="home-section" class="section active">
+            <h2>হোম</h2>
+            <div class="home-content">
+                <img id="demo-image" src="https://images.unsplash.com/photo-1594951556952-162f4770387b?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" alt="TikTok Style Video Thumbnail">
+                <p style="color: var(--tiktok-gray); margin-bottom: 25px;">আপনার ভিডিওর প্রিভিউ এখানে দেখা যাবে। আপনি চাইলে এই লিংকটি পরিবর্তন করতে পারেন।</p>
+                <div class="home-stats">
+                    <span><i class="fas fa-heart"></i> <span id="home-likes">0</span> লাইক</span>
+                    <span><i class="fas fa-eye"></i> <span id="home-views">0</span> ভিউ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Section -->
+        <div id="task-section" class="section">
+            <h2>টাস্ক</h2>
+            <div class="task-list">
+                <h3>আমাদের চ্যানেলগুলো সাপোর্ট করুন</h3>
+                <div class="task-item" data-link="https://t.me/your_telegram_channel" data-platform="Telegram">
+                    <img src="https://via.placeholder.com/45/229ED9/FFFFFF?text=TG" alt="Telegram Logo">
+                    <span>Telegram Channel</span>
+                    <i class="fas fa-chevron-right task-link-icon"></i>
+                </div>
+                <div class="task-item" data-link="https://www.youtube.com/your_youtube_channel" data-platform="YouTube">
+                    <img src="https://via.placeholder.com/45/FF0000/FFFFFF?text=YT" alt="YouTube Logo">
+                    <span>YouTube Channel</span>
+                    <i class="fas fa-chevron-right task-link-icon"></i>
+                </div>
+                <div class="task-item" data-link="https://www.facebook.com/your_facebook_page" data-platform="Facebook">
+                    <img src="https://via.placeholder.com/45/1877F2/FFFFFF?text=FB" alt="Facebook Logo">
+                    <span>Facebook Page</span>
+                    <i class="fas fa-chevron-right task-link-icon"></i>
+                </div>
+                <div class="task-item" data-link="https://www.tiktok.com/@your_tiktok_id" data-platform="TikTok">
+                    <img src="https://via.placeholder.com/45/000000/FFFFFF?text=TT" alt="TikTok Logo">
+                    <span>TikTok Profile</span>
+                    <i class="fas fa-chevron-right task-link-icon"></i>
+                </div>
+                <!-- Add more task items as needed -->
+            </div>
+        </div>
+
+        <!-- Collect User Section -->
+        <div id="collect-user-section" class="section">
+            <h2>কালেক্ট ইউজার</h2>
+            <div class="collect-options">
+                <h3>বিজ্ঞাপন দেখুন এবং লাইক বা ভিউ সংগ্রহ করুন</h3>
+                <p class="ads-counter">বিজ্ঞাপন দেখা হয়েছে: <span id="ads-watched-count">0</span> / <span id="ads-per-break">20</span></p>
+                <button class="app-btn" id="collect-like-btn"><i class="fas fa-thumbs-up"></i> +5 লাইক পান</button>
+                <button class="app-btn" id="collect-view-btn"><i class="fas fa-eye"></i> +10 ভিউ পান</button>
+                <p style="color: var(--tiktok-gray); font-size: 0.85em; text-align: center; margin-top: 15px;">বিজ্ঞাপন দেখার পর পুরস্কার পেতে, অনুগ্রহ করে আপনার ব্রাউজারের ব্যাক বাটনে ক্লিক করে অ্যাপে ফিরে আসুন।</p>
+            </div>
+        </div>
+
+        <!-- Add User Section -->
+        <div id="add-user-section" class="section">
+            <h2>অ্যাড ইউজার</h2>
+            <div class="add-user-options">
+                <h3>আপনার ভিডিওতে লাইক/ভিউ অর্ডার করুন</h3>
+                <button class="app-btn" id="add-like-btn"><i class="fas fa-heart"></i> লাইক অর্ডার করুন</button>
+                <button class="app-btn" id="add-view-btn"><i class="fas fa-video"></i> ভিউ অর্ডার করুন</button>
+            </div>
+        </div>
+
+        <!-- Live Chat Section -->
+        <div id="live-chat-section" class="section">
+            <h2>লাইভ চ্যাট</h2>
+            <div id="name-photo-entry-container" class="name-photo-entry-popup">
+                <h3>আপনার TikTok ইউজারনেম ও ছবি দিন চ্যাটে যোগ দিতে</h3>
+                <div class="profile-picture-upload">
+                    <img id="profile-picture-preview" src="#" alt="প্রোফাইল ছবি প্রিভিউ">
+                    <label for="profile-picture-input">
+                        <i class="fas fa-camera"></i> প্রোফাইল ছবি আপলোড করুন
+                    </label>
+                    <input type="file" id="profile-picture-input" accept="image/*">
+                    <p style="font-size: 0.8em; color: var(--tiktok-gray); margin-top: 5px;">(ঐচ্ছিক: ছবি আপলোড না করলে জেনেরিক অ্যাভাতার ব্যবহার করা হবে)</p>
+                </div>
+                <input type="text" id="chat-tiktok-username-input" placeholder="আপনার TikTok ইউজারনেম (যেমন: @yourusername)">
+                <button class="app-btn" id="join-chat-btn"><i class="fas fa-comments"></i> চ্যাটে যোগ দিন</button>
+            </div>
+
+            <div id="chat-container" class="chat-window" style="display: none;">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Chat messages will be dynamically added here -->
+                    <div class="chat-message-wrapper">
+                        <img src="https://via.placeholder.com/40/808080/FFFFFF?text=S" alt="System Avatar" class="chat-message-avatar">
+                        <div class="chat-message"><div class="sender-name">সিস্টেম</div> স্বাগতম! এখানে সবাই চ্যাট করতে পারবে।</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-message-input" placeholder="মেসেজ লিখুন...">
+                    <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <a href="#" class="nav-item active" data-section="home-section">
+            <i class="fas fa-home"></i>
+            <span>হোম</span>
+        </a>
+        <a href="#" class="nav-item" data-section="task-section">
+            <i class="fas fa-tasks"></i>
+            <span>টাস্ক</span>
+        </a>
+        <a href="#" class="nav-item" data-section="collect-user-section">
+            <i class="fas fa-plus-circle"></i>
+            <span>কালেক্ট</span>
+        </a>
+        <a href="#" class="nav-item" data-section="add-user-section">
+            <i class="fas fa-user-plus"></i>
+            <span>অ্যাড</span>
+        </a>
+        <a href="#" class="nav-item" data-section="live-chat-section">
+            <i class="fas fa-comments"></i>
+            <span>চ্যাট</span>
+        </a>
+    </div>
+
+    <!-- Popups for Add User (Like and View) -->
+    <div id="add-like-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" data-popup="add-like-popup">&times;</span>
+            <h3>ভিডিওতে লাইক নিন</h3>
+            <p>আপনার পছন্দের ভিডিওর ইউআরএল দিন এবং কত লাইক নিতে চান তা উল্লেখ করুন (কমপক্ষে 50 লাইক)।</p>
+            <input type="text" id="like-video-url" placeholder="ভিডিও ইউআরএল (যেমন: https://vt.tiktok.com/ZSdX...)">
+            <input type="number" id="like-count" placeholder="লাইক সংখ্যা (ন্যূনতম 50)" min="50">
+            <div class="popup-action-buttons">
+                <button class="app-btn" id="submit-like-request">সাবমিট</button>
+                <button class="app-btn cancel-btn" data-popup="add-like-popup">বাতিল</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-view-popup" class="popup">
+        <div class="popup-content">
+            <span class="close-btn" data-popup="add-view-popup">&times;</span>
+            <h3>ভিডিওতে ভিউ নিন</h3>
+            <p>আপনার পছন্দের ভিডিওর ইউআরএল দিন এবং কত ভিউ নিতে চান তা উল্লেখ করুন (কমপক্ষে 500 ভিউ)।</p>
+            <input type="text" id="view-video-url" placeholder="ভিডিও ইউআরএল (যেমন: https://vt.tiktok.com/ZSdX...)">
+            <input type="number" id="view-count" placeholder="ভিউ সংখ্যা (ন্যূনতম 500)" min="500">
+            <div class="popup-action-buttons">
+                <button class="app-btn" id="submit-view-request">সাবমিট</button>
+                <button class="app-btn cancel-btn" data-popup="add-view-popup">বাতিল</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK CDN Links -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // ⚠️⚠️⚠️ এখানে আপনার Monetag Direct Link দিন ⚠️⚠️⚠️
+        // এটি আপনার Monetag অ্যাকাউন্ট থেকে "Direct Link" অ্যাড ফরম্যাট তৈরি করে পাওয়া উচিত।
+        // উদাহরণস্বরূপ: const MONETAG_DIRECT_LINK = 'https://your.monetag.directlink.com/ads?zone_id=12345';
+        const MONETAG_DIRECT_LINK = 'YOUR_MONETAG_DIRECT_LINK_HERE'; // <--- এখানে আপনার ডিরেক্ট লিংকটি দিন
+
+        // ⚠️⚠️⚠️ নিরাপত্তা সতর্কতা: আপনার Telegram Bot Token এবং Chat ID এখানে সরাসরি প্রকাশ করা হচ্ছে।
+        // এটি শুধুমাত্র পরীক্ষার উদ্দেশ্যে এবং উৎপাদন পরিবেশে ব্যবহারের জন্য চরম অনিরাপদ।
+        const TELEGRAM_BOT_TOKEN = '8222557247:AAHASwCI0dD_9v62RJLe8DYtz1CbiyjLmak'; // আপনার বটের টোকেন এখানে দিন
+        const TELEGRAM_CHAT_ID = '-1003065903451';   // আপনার চ্যানেল বা ব্যক্তিগত চ্যাট আইডি এখানে দিন (যেমন: -1001234567890)
+        // ⚠️⚠️⚠️ নিরাপত্তা সতর্কতা শেষ ⚠️⚠️⚠️
+
+        // --- Firebase Configuration ---
+        // ⚠️⚠️⚠️ আপনার Firebase প্রজেক্টের কনফিগারেশন এখানে পেস্ট করুন ⚠️⚠️⚠️
+        const firebaseConfig = {
+  apiKey: "AIzaSyDu-bLvEVu2d613PozaabyJnH0O_L9au78",
+  authDomain: "tiktok-suport-39e1b.firebaseapp.com",
+  databaseURL: "https://tiktok-suport-39e1b-default-rtdb.firebaseio.com",
+  projectId: "tiktok-suport-39e1b",
+  storageBucket: "tiktok-suport-39e1b.firebasestorage.app",
+  messagingSenderId: "444975364094",
+  appId: "1:444975364094:web:9e84b361d549964f1af2af"
+};
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const chatRef = database.ref('messages'); // 'messages' নোডে চ্যাট মেসেজ সংরক্ষণ করা হবে
+
+        // --- Configuration for Ad Break ---
+        const LIKE_ADS_PER_BREAK = 20; // Number of ads to watch before a break
+        const ADS_BREAK_DURATION_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+
+        // Initial values are 0, loaded from local storage or set to 0 if not found
+        let userLikes = localStorage.getItem('userLikes') ? parseInt(localStorage.getItem('userLikes')) : 0;
+        let userViews = localStorage.getItem('userViews') ? parseInt(localStorage.getItem('userViews')) : 0;
+        let chatTikTokUsername = localStorage.getItem('chatTikTokUsername') || ''; // Load TikTok username from local storage
+        let chatUserAvatar = localStorage.getItem('chatUserAvatar') || ''; // Load user avatar (Base64)
+        let adsWatchedCount = localStorage.getItem('adsWatchedCount') ? parseInt(localStorage.getItem('adsWatchedCount')) : 0;
+        let breakEndTime = localStorage.getItem('breakEndTime') ? parseInt(localStorage.getItem('breakEndTime')) : 0;
+
+        // UI elements
+        const totalLikesSpan = document.getElementById('total-likes');
+        const totalViewsSpan = document.getElementById('total-views');
+        const homeLikesSpan = document.getElementById('home-likes');
+        const homeViewsSpan = document.getElementById('home-views');
+        const adsWatchedCountSpan = document.getElementById('ads-watched-count');
+        const adsPerBreakSpan = document.getElementById('ads-per-break');
+        const collectLikeBtn = document.getElementById('collect-like-btn');
+        const collectViewBtn = document.getElementById('collect-view-btn');
+        const breakTimerDisplay = document.getElementById('break-timer');
+        const chatMessagesDiv = document.getElementById('chat-messages');
+
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const profilePicturePreview = document.getElementById('profile-picture-preview');
+        const chatTikTokUsernameInput = document.getElementById('chat-tiktok-username-input');
+        const namePhotoEntryContainer = document.getElementById('name-photo-entry-container');
+        const chatContainer = document.getElementById('chat-container');
+
+        let breakTimerInterval = null; // To store the interval for the break timer
+
+        // Update UI for likes, views, and ads watched count
+        function updateStats() {
+            totalLikesSpan.textContent = userLikes;
+            totalViewsSpan.textContent = userViews;
+            homeLikesSpan.textContent = userLikes;
+            homeViewsSpan.textContent = userViews;
+            adsWatchedCountSpan.textContent = adsWatchedCount;
+            adsPerBreakSpan.textContent = LIKE_ADS_PER_BREAK;
+
+            localStorage.setItem('userLikes', userLikes);
+            localStorage.setItem('userViews', userViews);
+            localStorage.setItem('adsWatchedCount', adsWatchedCount);
+            localStorage.setItem('breakEndTime', breakEndTime); // Save break end time
+            localStorage.setItem('chatTikTokUsername', chatTikTokUsername); // Save TikTok username
+            localStorage.setItem('chatUserAvatar', chatUserAvatar); // Save user avatar
+        }
+
+        // --- Ad Break Logic ---
+        function startAdBreak() {
+            breakEndTime = Date.now() + ADS_BREAK_DURATION_MS;
+            localStorage.setItem('breakEndTime', breakEndTime);
+            adsWatchedCount = 0; // Reset ads watched count after break starts
+            localStorage.setItem('adsWatchedCount', adsWatchedCount);
+            updateStats();
+            checkAdBreakStatus(); // Immediately update button states and start timer
+            alert(`আপনি ${LIKE_ADS_PER_BREAK}টি বিজ্ঞাপন দেখেছেন! এখন ${ADS_BREAK_DURATION_MS / 3600000} ঘণ্টার জন্য একটি ব্রেক শুরু হয়েছে।`);
+        }
+
+        function checkAdBreakStatus() {
+            const now = Date.now();
+            if (breakEndTime > now) {
+                // Currently in a break
+                collectLikeBtn.disabled = true;
+                collectViewBtn.disabled = true;
+                collectLikeBtn.textContent = 'ব্রেক চলছে...';
+                collectViewBtn.textContent = 'ব্রেক চলছে...';
+                breakTimerDisplay.style.display = 'inline-block'; // Show timer
+                if (!breakTimerInterval) {
+                    breakTimerInterval = setInterval(updateBreakTimer, 1000);
+                }
+            } else {
+                // Not in a break or break has ended
+                collectLikeBtn.disabled = false;
+                collectViewBtn.disabled = false;
+                collectLikeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i> +5 লাইক পান';
+                collectViewBtn.innerHTML = '<i class="fas fa-eye"></i> +10 ভিউ পান';
+                breakTimerDisplay.style.display = 'none'; // Hide timer
+                clearInterval(breakTimerInterval); // Stop timer
+                breakTimerInterval = null;
+                // If break just ended, ensure adsWatchedCount is reset if it wasn't already
+                if (adsWatchedCount >= LIKE_ADS_PER_BREAK) {
+                    adsWatchedCount = 0;
+                    localStorage.setItem('adsWatchedCount', adsWatchedCount);
+                    updateStats();
+                }
+            }
+        }
+
+        function updateBreakTimer() {
+            const now = Date.now();
+            const timeLeft = breakEndTime - now;
+
+            if (timeLeft <= 0) {
+                // Break ended
+                checkAdBreakStatus();
+                alert('আপনার বিজ্ঞাপনের ব্রেক শেষ হয়েছে! এখন আবার বিজ্ঞাপন দেখতে পারবেন।');
+                return;
+            }
+
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            breakTimerDisplay.textContent = `ব্রেক: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // --- SECTION NAVIGATION ---
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+
+                const targetSectionId = this.getAttribute('data-section');
+                document.getElementById(targetSectionId).classList.add('active');
+                this.classList.add('active');
+
+                // Special handling for live chat to check for username and avatar
+                if (targetSectionId === 'live-chat-section') {
+                    if (chatTikTokUsername) {
+                        namePhotoEntryContainer.style.display = 'none';
+                        chatContainer.style.display = 'flex';
+                        // No need to loadChatMessages here, Firebase listener handles it
+                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll chat to bottom when entering
+                    } else {
+                        namePhotoEntryContainer.style.display = 'flex';
+                        chatContainer.style.display = 'none';
+                        // Reset preview if user is re-entering setup
+                        profilePicturePreview.src = '#';
+                        profilePicturePreview.classList.remove('active');
+                        chatTikTokUsernameInput.value = '';
+                    }
+                } else {
+                    namePhotoEntryContainer.style.display = 'none';
+                    chatContainer.style.display = 'none';
+                }
+            });
+        });
+
+        // --- TASK SECTION - Open links ---
+        document.querySelectorAll('.task-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const link = this.getAttribute('data-link');
+                const platform = this.getAttribute('data-platform');
+                if (link) {
+                    window.open(link, '_blank');
+                    alert(`আপনি ${platform} লিঙ্কে ক্লিক করেছেন!`);
+                }
+            });
+        });
+
+        // --- COLLECT USER SECTION ---
+        function openMonetagDirectLink(rewardType) {
+            if (!MONETAG_DIRECT_LINK || MONETAG_DIRECT_LINK === 'YOUR_MONETAG_DIRECT_LINK_HERE') {
+                alert('Monetag ডিরেক্ট লিংক সেট করা নেই। অনুগ্রহ করে আপনার Monetag ডিরেক্ট লিংকটি সেট করুন।');
+                return;
+            }
+
+            // Check if user is in an ad break
+            if (breakEndTime > Date.now()) {
+                alert('এখন বিজ্ঞাপন দেখার ব্রেক চলছে। অনুগ্রহ করে কিছুক্ষণ অপেক্ষা করুন।');
+                return;
+            }
+
+            // Temporarily disable buttons and indicate loading
+            collectLikeBtn.disabled = true;
+            collectViewBtn.disabled = true;
+            collectLikeBtn.textContent = 'বিজ্ঞাপন লোড হচ্ছে...';
+            collectViewBtn.textContent = 'বিজ্ঞাপন লোড হচ্ছে...';
+
+            const adWindow = window.open(MONETAG_DIRECT_LINK, '_blank');
+
+            // Set a timeout to simulate ad viewing and reward
+            setTimeout(() => {
+                // Re-enable buttons if for some reason reward logic fails or user doesn't return
+                collectLikeBtn.disabled = false;
+                collectViewBtn.disabled = false;
+                collectLikeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i> +5 লাইক পান';
+                collectViewBtn.innerHTML = '<i class="fas fa-eye"></i> +10 ভিউ পান';
+
+
+                // In a real application, you'd need a server-side callback from Monetag
+                // to confirm the ad was viewed and then give the reward.
+                // For this client-side demo, we'll assume it was viewed after a delay.
+                alert('বিজ্ঞাপন দেখা হয়েছে! পুরস্কার পেতে অ্যাপে ফিরে আসুন।'); // Instruct user to return
+
+                // After a short delay (simulating user returning and app detecting it)
+                setTimeout(() => {
+                    if (rewardType === 'like') {
+                        userLikes += 5;
+                        alert('আপনি 5 লাইক পেয়েছেন!');
+                    } else if (rewardType === 'view') {
+                        userViews += 10;
+                        alert('আপনি 10 ভিউ পেয়েছেন!');
+                    }
+                    adsWatchedCount++;
+                    updateStats(); // Update stats and ads watched count
+
+                    if (adsWatchedCount >= LIKE_ADS_PER_BREAK) {
+                        startAdBreak(); // Start break if limit reached
+                    } else {
+                        checkAdBreakStatus(); // Update button status (e.g., enable if break ended)
+                    }
+                }, 3000); // Give user 3 seconds to return from ad
+            }, 2000); // 2 seconds to simulate ad loading
+        }
+
+        collectLikeBtn.addEventListener('click', function() {
+            openMonetagDirectLink('like');
+        });
+
+        collectViewBtn.addEventListener('click', function() {
+            openMonetagDirectLink('view');
+        });
+
+        // --- ADD USER SECTION Popups ---
+        document.getElementById('add-like-btn').addEventListener('click', function() {
+            document.getElementById('add-like-popup').style.display = 'flex';
+        });
+
+        document.getElementById('add-view-btn').addEventListener('click', function() {
+            document.getElementById('add-view-popup').style.display = 'flex';
+        });
+
+        document.querySelectorAll('.close-btn, .cancel-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const popupId = this.getAttribute('data-popup');
+                document.getElementById(popupId).style.display = 'none';
+            });
+        });
+
+        // Function to send Telegram notification directly from browser
+        async function sendTelegramNotification(type, videoUrl, count, username) {
+            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID || TELEGRAM_BOT_TOKEN === 'YOUR_TELEGRAM_BOT_TOKEN' || TELEGRAM_CHAT_ID === 'YOUR_TELEGRAM_CHAT_ID') {
+                console.error("Telegram bot token or chat ID is not set in client-side configuration.");
+                alert("Telegram Bot Token বা Chat ID সেট করা নেই। নোটিফিকেশন পাঠানো সম্ভব নয়।");
+                return false;
+            }
+
+            let messageText = "";
+            if (type === 'like_request') {
+                messageText = `✨ নতুন লাইক অনুরোধ ✨\n\nইউজার: @${username || 'Anonymous User'}\nলাইক সংখ্যা: ${count}\nভিডিও লিংক: ${videoUrl}`;
+            } else if (type === 'view_request') {
+                messageText = `👁️ নতুন ভিউ অনুরোধ 👁️\n\nইউজার: @${username || 'Anonymous User'}\nভিউ সংখ্যা: ${count}\nভিডিও লিংক: ${videoUrl}`;
+            } else {
+                console.error("Invalid request type for Telegram notification.");
+                return false;
+            }
+
+            const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+            try {
+                const response = await fetch(telegramApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: messageText,
+                        parse_mode: 'HTML'
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.ok) {
+                    console.log("Telegram notification sent successfully!");
+                    return true;
+                } else {
+                    console.error("Failed to send Telegram notification:", data);
+                    alert(`টেলিগ্রাম নোটিফিকেশন পাঠাতে সমস্যা হয়েছে: ${data.description || 'অজানা ত্রুটি'}`);
+                    return false;
+                }
+            } catch (error) {
+                console.error("Error sending message to Telegram:", error.message);
+                alert("টেলিগ্রাম নোটিফিকেশন পাঠাতে নেটওয়ার্ক সমস্যা হয়েছে।");
+                return false;
+            }
+        }
+
+
+        // --- Submit Like Request ---
+        document.getElementById('submit-like-request').addEventListener('click', async function() {
+            const videoUrl = document.getElementById('like-video-url').value;
+            const likeCount = parseInt(document.getElementById('like-count').value);
+
+            if (!videoUrl || videoUrl.trim() === '') {
+                alert('অনুগ্রহ করে ভিডিও ইউআরএল দিন।');
+                return;
+            }
+            if (!videoUrl.startsWith('http')) {
+                alert('দয়া করে একটি বৈধ ভিডিও ইউআরএল দিন (http বা https দিয়ে শুরু হবে)।');
+                return;
+            }
+            if (isNaN(likeCount) || likeCount < 50) {
+                alert('লাইক সংখ্যা ন্যূনতম 50 হতে হবে।');
+                return;
+            }
+            if (userLikes < likeCount) {
+                alert(`আপনার যথেষ্ট লাইক নেই। আপনার আছে ${userLikes}টি, কিন্তু ${likeCount}টি প্রয়োজন। আরও লাইক সংগ্রহ করুন।`);
+                return;
+            }
+
+            // Attempt to send Telegram notification
+            const notificationSent = await sendTelegramNotification('like_request', videoUrl, likeCount, chatTikTokUsername);
+
+            if (notificationSent) {
+                // Deduct likes and update stats ONLY if notification was sent successfully
+                userLikes -= likeCount;
+                updateStats();
+                document.getElementById('add-like-popup').style.display = 'none';
+                document.getElementById('like-video-url').value = '';
+                document.getElementById('like-count').value = '';
+                alert(`আপনার ${likeCount} লাইকের অনুরোধ জমা দেওয়া হয়েছে। আপনার লাইক ব্যালেন্স থেকে ${likeCount} লাইক কেটে নেওয়া হয়েছে।`);
+            } else {
+                alert('লাইকের অনুরোধ জমা দিতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            }
+        });
+
+        // --- Submit View Request ---
+        document.getElementById('submit-view-request').addEventListener('click', async function() {
+            const videoUrl = document.getElementById('view-video-url').value;
+            const viewCount = parseInt(document.getElementById('view-count').value);
+
+            if (!videoUrl || videoUrl.trim() === '') {
+                alert('অনুগ্রহ করে ভিডিও ইউআরএল দিন।');
+                return;
+            }
+            if (!videoUrl.startsWith('http')) {
+                alert('দয়া করে একটি বৈধ ভিডিও ইউআরএল দিন (http বা https দিয়ে শুরু হবে)।');
+                return;
+            }
+            if (isNaN(viewCount) || viewCount < 500) {
+                alert('ভিউ সংখ্যা ন্যূনতম 500 হতে হবে।');
+                return;
+            }
+            if (userViews < viewCount) {
+                alert(`আপনার যথেষ্ট ভিউ নেই। আপনার আছে ${userViews}টি, কিন্তু ${viewCount}টি প্রয়োজন। আরও ভিউ সংগ্রহ করুন।`);
+                return;
+            }
+
+            // Attempt to send Telegram notification
+            const notificationSent = await sendTelegramNotification('view_request', videoUrl, viewCount, chatTikTokUsername);
+
+            if (notificationSent) {
+                // Deduct views and update stats ONLY if notification was sent successfully
+                userViews -= viewCount;
+                updateStats();
+                document.getElementById('add-view-popup').style.display = 'none';
+                document.getElementById('view-video-url').value = '';
+                document.getElementById('view-count').value = '';
+                alert(`আপনার ${viewCount} ভিউয়ের অনুরোধ জমা দেওয়া হয়েছে। আপনার ভিউ ব্যালেন্স থেকে ${viewCount} ভিউ কেটে নেওয়া হয়েছে।`);
+            } else {
+                alert('ভিউয়ের অনুরোধ জমা দিতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।');
+            }
+        });
+
+        // --- LIVE CHAT SECTION ---
+
+        // Function to get a generic avatar based on username (first letter)
+        function getGenericAvatarUrl(username) {
+            if (!username) return "https://via.placeholder.com/40/808080/FFFFFF?text=Anon"; // Default for anonymous
+
+            const initial = username.charAt(0).toUpperCase();
+            // A simple way to generate unique-ish placeholder avatars
+            const colors = ['#FE2C55', '#25F4EE', '#FFD700', '#6A5ACD', '#3CB371'];
+            const bgColor = colors[initial.charCodeAt(0) % colors.length];
+            return `https://via.placeholder.com/40/${bgColor.substring(1)}/FFFFFF?text=${initial}`;
+        }
+
+        // Handle profile picture input change
+        profilePictureInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profilePicturePreview.src = e.target.result;
+                    profilePicturePreview.classList.add('active'); // Show preview
+                };
+                reader.readAsDataURL(file); // Convert image to Base64
+            } else {
+                profilePicturePreview.src = '#';
+                profilePicturePreview.classList.remove('active');
+            }
+        });
+
+        // Function to append a chat message to the UI
+        function appendChatMessage(sender, message, isOwn = false, avatarUrl, messageId) {
+            // Check if message already exists to prevent duplicates (important for Firebase listeners)
+            if (document.getElementById(`chat-msg-${messageId}`)) {
+                return;
+            }
+
+            const newMessageWrapper = document.createElement('div');
+            newMessageWrapper.classList.add('chat-message-wrapper');
+            newMessageWrapper.id = `chat-msg-${messageId}`; // Assign a unique ID
+            if (isOwn) {
+                newMessageWrapper.classList.add('own');
+            }
+
+            const avatarImg = document.createElement('img');
+            avatarImg.classList.add('chat-message-avatar');
+            // Use provided avatar (Base64 from local storage) or generate generic
+            avatarImg.src = avatarUrl || getGenericAvatarUrl(sender);
+            avatarImg.alt = `${sender} Avatar`;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+            messageDiv.innerHTML = `<div class="sender-name">@${sender}</div>${message}`;
+
+            newMessageWrapper.appendChild(avatarImg);
+            newMessageWrapper.appendChild(messageDiv);
+            chatMessagesDiv.appendChild(newMessageWrapper);
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        // Firebase listener for new chat messages
+        chatRef.on('child_added', (snapshot) => {
+            const messageData = snapshot.val();
+            const messageId = snapshot.key; // Get the unique key from Firebase
+            const isOwnMessage = (messageData.sender === chatTikTokUsername);
+            appendChatMessage(messageData.sender, messageData.message, isOwnMessage, messageData.avatar, messageId);
+        });
+
+
+        document.getElementById('join-chat-btn').addEventListener('click', function() {
+            let enteredUsername = chatTikTokUsernameInput.value.trim();
+
+            if (enteredUsername && enteredUsername.length >= 3) { // Minimum 3 characters
+                // Ensure username starts with '@'
+                if (!enteredUsername.startsWith('@')) {
+                    enteredUsername = '@' + enteredUsername;
+                }
+                chatTikTokUsername = enteredUsername;
+
+                // Save selected or default avatar
+                if (profilePicturePreview.src && profilePicturePreview.src !== window.location.href + '#') {
+                    chatUserAvatar = profilePicturePreview.src; // Base64 image
+                } else {
+                    chatUserAvatar = getGenericAvatarUrl(chatTikTokUsername); // Generate generic if none uploaded
+                }
+
+                localStorage.setItem('chatTikTokUsername', chatTikTokUsername);
+                localStorage.setItem('chatUserAvatar', chatUserAvatar);
+
+                namePhotoEntryContainer.style.display = 'none';
+                chatContainer.style.display = 'flex';
+                // The Firebase listener will load existing messages automatically
+                // No need for loadChatMessages() here as Firebase handles real-time updates
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Scroll to bottom
+                alert(`আপনি '${chatTikTokUsername}' নামে চ্যাটে যোগ দিয়েছেন।`);
+            } else {
+                alert('অনুগ্রহ করে একটি বৈধ TikTok ইউজারনেম দিন (কমপক্ষে 3 অক্ষর)।');
+            }
+        });
+
+        document.getElementById('send-chat-btn').addEventListener('click', function() {
+            const messageInput = document.getElementById('chat-message-input');
+            const message = messageInput.value.trim();
+
+            if (message && chatTikTokUsername) {
+                // Push message to Firebase Realtime Database
+                chatRef.push({
+                    sender: chatTikTokUsername,
+                    message: message,
+                    avatar: chatUserAvatar,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP // Firebase server timestamp
+                });
+
+                messageInput.value = '';
+                // No need to call appendChatMessage or saveChatMessage manually here.
+                // The 'child_added' Firebase listener will trigger and add the message to the UI.
+            }
+        });
+
+        // Allow sending message with Enter key in chat
+        document.getElementById('chat-message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-chat-btn').click();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        // Initial update when page loads
+        updateStats();
+        checkAdBreakStatus(); // Check and activate ad break timer if necessary
+
+        // Ensure correct section is shown on initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeSectionId = document.querySelector('.nav-item.active').getAttribute('data-section');
+            document.getElementById(activeSectionId).classList.add('active');
+
+            if (activeSectionId === 'live-chat-section') {
+                if (chatTikTokUsername) { // If username is already set
+                    namePhotoEntryContainer.style.display = 'none';
+                    chatContainer.style.display = 'flex';
+                    // Firebase listener will populate messages
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                } else { // First time or username not set
+                    namePhotoEntryContainer.style.display = 'flex';
+                    chatContainer.style.display = 'none';
+                }
+            }
+        });
+
+        // Load existing avatar if available on chat entry screen
+        if (chatUserAvatar && !chatTikTokUsername) { // Only show preview if username not yet set, for setup screen
+            profilePicturePreview.src = chatUserAvatar;
+            profilePicturePreview.classList.add('active');
+        }
+        if (chatTikTokUsername) { // Pre-fill username if already set
+            chatTikTokUsernameInput.value = chatTikTokUsername;
+        }
+
+    </script>
+</body>
+</html>
